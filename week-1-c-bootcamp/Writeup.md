@@ -3,7 +3,7 @@
 
 # Task List
 - [X] Complete Setup (clone repos)
-- [ ] Assignment 1: Factorization
+- [x] Assignment 1: Factorization
 
 # Assignment 1
 
@@ -32,3 +32,17 @@ BigNumber: 4185633689926419097
 * Average: 10.06675 ms
 
 # Part 4 Data:
+
+BigNumber: 202151201131415575
+* Search 1: 0.095000 ms
+* Search 2: 0.093000 ms
+* Search 3: 0.119000 ms
+* Search 4: 0.094000 ms
+* Average: .10025 ms
+
+BigNumber: 4185633689926419097
+* Search 1: 5.073000 ms
+* Search 2: 5.430000 ms
+* Search 3: 5.505000 ms
+* Search 4: 5.295000 ms
+* Average: 5.32575 ms

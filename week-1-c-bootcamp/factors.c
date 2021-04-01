@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   }
   else
   {
-    for (i = 3; i < ULLONG_MAX; i++)
+    for (i = 3; i <= sqrt(bignumber); i += 2)
     {
       if ((bignumber % i) == 0)
       {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
           printf("I found %llu\n",bignumber/i);
           isPrime = false;
         }
-        i = ULLONG_MAX - 1;
+        i = bignumber;
       }
     }
     if(isPrime)
