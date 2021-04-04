@@ -5,7 +5,7 @@
 - [x] Complete Setup (clone repos)
 - [x] Assignment 1: Factorization
 - [x] Assignment 2: Vectors
-- [] Assignment 1: Linked Lists
+- [ ] Assignment 1: Linked Lists
 
 
 # Assignment 1
