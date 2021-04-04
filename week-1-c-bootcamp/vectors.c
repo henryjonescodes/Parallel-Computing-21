@@ -18,7 +18,10 @@ author: John Rieffel
 //argv is an *array* of strings
 
 bool TEST_PART_4 = false;
-bool TEST_PART_5 = true;
+bool TEST_PART_5 = false;
+bool TEST_PART_6 = false;
+bool TEST_PART_7 = true;
+bool VERBOSE_TESTS = true;
 
 double * randomize_vector(double *vec, int size)
 {
@@ -74,11 +77,23 @@ double * add_vectors(double *vec, double *vec2, int size){
   return vec3;
 }
 
+double dot_product(double *vec, double *vec2, int size){
+  double product = 0;
+  double *p ,*p2;
+  double * vec_end = vec+size;
+  double * vec2_end = vec2+size;
+  for (p = vec, p2 = vec2; (p < vec_end && p2 < vec2_end); p++, p2++)
+  {
+    product = (*p * *p2) + product;
+  }
+  return product;
+}
 
 int main(int argc, char *argv[])
 {
-  int SIZE = 0;
+  clock_t startTime = clock();
 
+  int SIZE = 0;
   if ((argc < 2) || (argc > 3)){
     printf("usage: vectors <size> or vectors <size> <seed>\n ");
     exit(1);
@@ -94,6 +109,7 @@ int main(int argc, char *argv[])
 
   if(TEST_PART_4)
   {
+    printf("\nTesting pointer-based randomization\n");
     //calloc, unlike malloc, zeros the allocated memory
     double * vector1 =  calloc(SIZE,sizeof(double));
     double * vector2 =  calloc(SIZE,sizeof(double));
@@ -118,6 +134,7 @@ int main(int argc, char *argv[])
 
   if(TEST_PART_5)
   {
+    printf("\nTesting vector addition\n");
     double * vector1 =  calloc(SIZE,sizeof(double));
     double * vector2 =  calloc(SIZE,sizeof(double));
     vector1 = randomize_vector(vector1, SIZE);
@@ -134,4 +151,71 @@ int main(int argc, char *argv[])
     print_vector(vector3,SIZE);
     printf("\n");
   }
+
+  if(TEST_PART_6)
+  {
+    printf("\nTesting vector dot product\n");
+    double * vector1 =  calloc(SIZE,sizeof(double));
+    double * vector2 =  calloc(SIZE,sizeof(double));
+    vector1 = randomize_vector(vector1, SIZE);
+    vector2 = randomize_vector(vector2, SIZE);
+    printf("Vector 1\n");
+    print_vector(vector1,SIZE);
+    printf("\nVector 2\n");
+    print_vector(vector2,SIZE);
+
+    double product =  dot_product(vector1,vector2, SIZE);
+    
+    printf("\nDot product is %lf\n", product);
+  }
+  
+  if(TEST_PART_7)
+  {
+    printf("\nTesting running time\n");
+  
+    clock_t start = clock();
+    double * vector1 =  calloc(SIZE,sizeof(double));
+    vector1 = randomize_vector(vector1, SIZE);
+    clock_t thisTime = clock();
+    double elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
+    printf("\nrandomize_vector took %f ms\n",elapsedTime);
+    
+    start = clock();
+    double * vector2 =  calloc(SIZE,sizeof(double));
+    vector2 = randomize_vector_p(vector2, SIZE);
+    thisTime = clock();
+    elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
+    printf("\nrandomize_vector_p took %f ms\n",elapsedTime);
+
+    if(VERBOSE_TESTS){
+      printf("\n");
+      start = clock();
+      print_vector(vector1,SIZE);
+      thisTime = clock();
+      elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
+      printf("\n\nprint_vector took %f ms\n\n",elapsedTime);
+
+      start = clock();
+      print_vector_p(vector2,SIZE);
+      thisTime = clock();
+      elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
+      printf("\n\nprint_vector_p took %f ms\n",elapsedTime);
+    }
+
+    start = clock();
+    double * vector3 = add_vectors(vector1,vector2, SIZE);
+    thisTime = clock();
+    elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
+    printf("\nadd_vectors took %f ms\n",elapsedTime);
+
+    start = clock();
+    double product =  dot_product(vector1,vector2, SIZE);
+    thisTime = clock();
+    elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
+    printf("\ndot_product took %f ms\n",elapsedTime);
+  }
+
+  clock_t endTime = clock();
+  double elapsed =  (double)(endTime - startTime) * 1000.0 / CLOCKS_PER_SEC;
+  printf("\nDone, that took %f ms\n",elapsed);
 }
