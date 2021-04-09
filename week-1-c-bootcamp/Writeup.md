@@ -5,7 +5,7 @@
 - [x] Complete Setup (clone repos)
 - [x] Assignment 1: Factorization
 - [x] Assignment 2: Vectors
-- [ ] Assignment 1: Linked Lists
+- [ ] Assignment 3: Linked Lists
 
 
 # Assignment 1
@@ -62,3 +62,9 @@ Increasing the `SIZE` argument beyond the actual vector size begins printing the
 Adding timing revealed that both pointer-based methods `print_vector_p` and `randomize_vector_p` ran consistently faster than their pass-by-value counterparts. The only thing that would cause this seems to be where `print_vector` and `randomize_vector` have to access the actual vector data structure through `vec[index]`. There's likely another step in there that's eliminated by accessing the data in memory directly with the pointer-based versions.
 
 Overall all methods run linearly since all tasks (printing, randomization, addition, and dot product) incorporate single (or parallel) for loops. As such, the methods only started to slow down when I tried extremely large values.
+
+# Assignment 3
+
+For linked lists, the printing was fairly straightforward: The program calls itself with the next pointer until reaching a stop condition when the pointer is NULL, printing each value along the way with `printf()`. 
+
+For recursive insertion I sat with it and rewrote but didn't manage to get it working properly. My idea was to save the head location and work my way along the list by calling the recursive function `do_insertRecursive()` with the pointer to the next node. However the stop condition was much more troubling, I couldn't figure out how to properly attach the pervious node to the inserted node.
