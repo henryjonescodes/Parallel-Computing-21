@@ -68,3 +68,26 @@ Overall all methods run linearly since all tasks (printing, randomization, addit
 For linked lists, the printing was fairly straightforward: The program calls itself with the next pointer until reaching a stop condition when the pointer is NULL, printing each value along the way with `printf()`. 
 
 For recursive insertion I sat with it and rewrote but didn't manage to get it working properly. My idea was to save the head location and work my way along the list by calling the recursive function `do_insertRecursive()` with the pointer to the next node. However the stop condition was much more troubling, I couldn't figure out how to properly attach the pervious node to the inserted node.
+
+# Feedback
+
+Factors: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
+- Notes: 
+
+Vectors: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
+- Notes: 
+
+Linked-List: 3/5
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [- ] Writeup and Analysis
+- Notes: too bad you couldn't get this to work - you were close!
