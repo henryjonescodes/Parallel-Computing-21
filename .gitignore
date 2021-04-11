@@ -1,0 +1,8 @@
+# Exclude these specific executibles
+a.out
+vectors
+linked-list
+factors
+
+# Other stuff
+.DS_Store
