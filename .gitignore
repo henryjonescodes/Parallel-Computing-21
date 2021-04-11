@@ -3,6 +3,7 @@ a.out
 vectors
 linked-list
 factors
+MPI_array_sum
 
 # Other stuff
 .DS_Store

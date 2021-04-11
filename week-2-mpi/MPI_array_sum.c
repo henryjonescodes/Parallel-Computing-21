@@ -1,7 +1,7 @@
 #include <mpi.h>
 #include <stdio.h>
-//to compile: mpicc -std=c99 -Wall MPI_blank_template.c -o MPI_blank
-//to run (simple): mpirun ./MPI_blank
+//to compile: mpicc -std=c99 -Wall MPI_array_sum.c -o MPI_array_sum
+//to run (simple): mpirun ./MPI_array_sum
 
 int main(int argc, char *argv[]){
 
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
 	// do some stuff
 
 	int i;
-  	int localsum = 0;
+  int localsum = 0;
 	int globalsum = 0;
 
 	int scalar = ArraySize/comm_sz;
@@ -37,9 +37,9 @@ int main(int argc, char *argv[]){
 		if(remainder >= my_rank){
 			my_end += 1;
 			my_start += my_rank;
-		} 
+		}
 		//Step remaining processes forward in array by remainder
-		else if (scalar != ArraySize){
+		else{
 			my_start += remainder;
 			my_end += remainder;
 		}
