@@ -20,8 +20,19 @@ author: John Rieffel
 bool TEST_PART_4 = false;
 bool TEST_PART_5 = false;
 bool TEST_PART_6 = false;
-bool TEST_PART_7 = true;
-bool VERBOSE_TESTS = true;
+bool TEST_PART_7 = false;
+bool VERBOSE_TESTS = false;
+bool TEST_DOT_PRODUCT_TIME = true;
+bool CONSTANT_VECTORS = false;
+
+double * fill_vector(double *vec, int size, double filler[])
+{
+  int index;
+  for (index= 0; index< size; index++ ) {
+   vec[index] = filler[index];
+  }
+  return vec;
+}
 
 double * randomize_vector(double *vec, int size)
 {
@@ -61,7 +72,6 @@ void print_vector_p(double *vec, int size)
   {
     printf("%f ", *p);
   }
-
 }
 
 double * add_vectors(double *vec, double *vec2, int size){
@@ -100,7 +110,7 @@ int main(int argc, char *argv[])
   }
   else {
       SIZE = atoi(argv[1]); //atoi converts a string to an int
-      printf("size: %d\n",SIZE);
+      printf("size: %d",SIZE);
       if (argc == 3)
         srand48(atoi(argv[2]));
       else
@@ -165,21 +175,21 @@ int main(int argc, char *argv[])
     print_vector(vector2,SIZE);
 
     double product =  dot_product(vector1,vector2, SIZE);
-    
+
     printf("\nDot product is %lf\n", product);
   }
-  
+
   if(TEST_PART_7)
   {
     printf("\nTesting running time\n");
-  
+
     clock_t start = clock();
     double * vector1 =  calloc(SIZE,sizeof(double));
     vector1 = randomize_vector(vector1, SIZE);
     clock_t thisTime = clock();
     double elapsedTime =  (double)(thisTime - start) * 1000.0 / CLOCKS_PER_SEC;
     printf("\nrandomize_vector took %f ms\n",elapsedTime);
-    
+
     start = clock();
     double * vector2 =  calloc(SIZE,sizeof(double));
     vector2 = randomize_vector_p(vector2, SIZE);
@@ -215,7 +225,39 @@ int main(int argc, char *argv[])
     printf("\ndot_product took %f ms\n",elapsedTime);
   }
 
-  clock_t endTime = clock();
-  double elapsed =  (double)(endTime - startTime) * 1000.0 / CLOCKS_PER_SEC;
-  printf("\nDone, that took %f ms\n",elapsed);
+  if(TEST_DOT_PRODUCT_TIME){
+    double * vector1 =  calloc(SIZE,sizeof(double));
+    double * vector2 =  calloc(SIZE,sizeof(double));
+    if(!CONSTANT_VECTORS){
+			//Randomize using pointer method
+			vector1 = randomize_vector_p(vector1, SIZE);
+			vector2 = randomize_vector_p(vector2, SIZE);
+		} else {
+			//Hard-coded test vectors (expected product vec1 • vec2 = 2.776287700675)
+			double vec1_array[] = {0.315817,0.021303,0.933138,0.463567,0.606694,
+							0.708238,0.638140,0.563823,0.733255,0.401841};
+			double vec2_array[] = {0.291766,0.439373,0.233446,0.231762,0.968261,
+							0.122894,0.741578,0.943867,0.410790,0.916815};
+			vector1 = fill_vector(vector1, SIZE, vec1_array);
+			vector2 = fill_vector(vector2, SIZE, vec2_array);
+		}
+
+    if(VERBOSE_TESTS){
+      printf("Vector1: ");
+      print_vector_p(vector1, SIZE);
+      printf("\nVector2: ");
+      print_vector_p(vector2, SIZE);
+    }
+
+    clock_t start = clock();
+    double product =  dot_product(vector1,vector2, SIZE);
+    clock_t thisTime = clock();
+    printf("\nvector1 • vector2 = %f",product);
+    double elapsedTime =  (double)(thisTime - start) * (double)1000.0000 / CLOCKS_PER_SEC;
+    printf("\ndot_product took %f ms\n",elapsedTime);
+  }
+
+  // clock_t endTime = clock();
+  // double elapsed =  (double)(endTime - startTime) * 1000.0 / CLOCKS_PER_SEC;
+  // printf("\nDone, that took %f ms\n",elapsed);
 }
