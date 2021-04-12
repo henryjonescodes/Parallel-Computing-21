@@ -4,6 +4,7 @@ vectors
 linked-list
 factors
 MPI_array_sum
+MPI_vector_dot
 
 # Other stuff
 .DS_Store
