@@ -2,8 +2,8 @@
 
 # Tasks
 
-- [ ] Array Sum
-- [ ] Vector Dot
+- [X] Array Sum
+- [X] Vector Dot
 - [ ] Vector Add
 
 # Observations and Measures
