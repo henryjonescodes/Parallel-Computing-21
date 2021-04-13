@@ -5,6 +5,7 @@ linked-list
 factors
 MPI_array_sum
 MPI_vector_dot
+MPI_Normalize_Vector
 
 # Other stuff
 .DS_Store
