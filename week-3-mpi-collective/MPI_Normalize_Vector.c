@@ -8,6 +8,9 @@
 #include <math.h>
 
 bool VERBOSE = false;
+bool CONSTANT_VECTOR = false;
+int MAX_VALUE = 1000;
+int MIN_VALUE = 0;
 
 //to compile: mpicc -std=c99 -Wall MPI_Normalize_Vector.c -o MPI_Normalize_Vector
 //to run (simple): mpirun ./MPI_Normalize_Vector
@@ -39,8 +42,12 @@ int * randomize_intVec(int *vec, int size)
   int * vec_end = vec+size;
   for (p = vec; p < vec_end; p++)
   {
-	//Shout out Ryan Kaplan for this lil bit
-    *p = rand() % (100+1 - 100) + 100;
+    if(CONSTANT_VECTOR){
+	     //Shout out Ryan Kaplan for this lil bit
+       *p = rand() % (100+1 - 100) + 100;
+    } else {
+       *p = rand() % (MAX_VALUE + 1 - MIN_VALUE) + MIN_VALUE;
+    }
   }
   return vec;
 }
@@ -58,37 +65,44 @@ double * normalize_vector(int *vec, double *result, int size, double magnitude)
 	return result;
 }
 
-// double parallel_magnitude(int *slice, int sliceSize){
-// }
+double parallel_magnitude(double *vector, int size, int my_rank, int comm_sz){
+  int sliceSize = size/comm_sz;
+	double *slice = malloc(sliceSize*sizeof(double));
 
-// int parallel_sumOfSquares(int *slice, int sliceSize, int my_rank, int comm_sz){
-//   int globalSumOfSquares = 0;
-// 	int sliceSum = 0;
-//
-//   //Calculate local sum of squares
-// 	int i;
-// 	for(i=0; i< sliceSize; i++){
-// 		int tmp = slice[i];
-// 		sliceSum += (tmp * tmp);
-// 	}
-//
-// 	//Only non-roots need to send back
-// 	if(my_rank != 0){
-// 		MPI_Send(&sliceSum,1,MPI_INT,0,0,MPI_COMM_WORLD);
-// 	} else {
-// 		//Add root process's work
-// 		globalSumOfSquares = globalSumOfSquares + sliceSum;
-//
-// 		//Add local sums from non root nodes
-// 		int src;
-// 		for(src = 1; src < comm_sz; src++){
-// 			int tmp;
-// 			MPI_Recv(&tmp,1,MPI_INT,src,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-// 			globalSumOfSquares = globalSumOfSquares + tmp;
-// 		}
-//   }
-//   return globalSumOfSquares;
-// }
+	double globalSumOfSquares = 0;
+	double sliceSum = 0;
+	double magnitude = 0;
+
+  //Send slices to all processes
+	MPI_Scatter(vector,sliceSize,MPI_DOUBLE,slice,sliceSize,MPI_DOUBLE,0,MPI_COMM_WORLD);
+
+	//Calculate local sum of squares
+	int i;
+	for(i=0; i< sliceSize; i++){
+		double tmp = slice[i];
+		sliceSum += (tmp * tmp);
+	}
+
+	//Only non-roots need to send back
+	if(my_rank != 0){
+		MPI_Send(&sliceSum,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+	} else {
+		//Add root process's work
+		globalSumOfSquares = globalSumOfSquares + sliceSum;
+
+		//Add local sums from non root nodes
+		int src;
+		for(src = 1; src < comm_sz; src++){
+			double tmp;
+			MPI_Recv(&tmp,1,MPI_DOUBLE,src,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+			globalSumOfSquares = globalSumOfSquares + tmp;
+		}
+
+		//Take square root
+		magnitude = sqrt(globalSumOfSquares);
+	}
+  return magnitude;
+}
 
 int main(int argc, char *argv[]){
 
@@ -148,6 +162,9 @@ int main(int argc, char *argv[]){
 		//Make the random vector
 		bigArray = malloc(SIZE*sizeof(int));
 		bigArray = randomize_intVec(bigArray, SIZE);
+
+    //And the result vector
+    bigResult = malloc(SIZE*sizeof(double));
 	}
 
   //Send slices to all processes
@@ -174,7 +191,6 @@ int main(int argc, char *argv[]){
 			MPI_Recv(&tmp,1,MPI_INT,src,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 			globalSumOfSquares = globalSumOfSquares + tmp;
 		}
-
 		//Take square root
 		magnitude = sqrt(globalSumOfSquares);
 	}
@@ -186,11 +202,11 @@ int main(int argc, char *argv[]){
 	if(magnitude > 0){
 		sliceNorm = normalize_vector(slice, sliceNorm, sliceSize, magnitude);
 	}
-	if(my_rank == 0){
-		bigResult = malloc(SIZE*sizeof(double));
-	}
 
 	MPI_Gather(sliceNorm,sliceSize,MPI_DOUBLE,bigResult,sliceSize,MPI_DOUBLE,0,MPI_COMM_WORLD);
+
+  //Test normalization by getting magnitude of the result vector
+  double magnitudeOfNormalized = parallel_magnitude(bigResult,SIZE,my_rank, comm_sz);
 
 	//Print stuff
 	if(my_rank == 0){
@@ -198,7 +214,8 @@ int main(int argc, char *argv[]){
 		print_intVec(bigArray, SIZE);
 		printf("\nNormalized: ");
 		print_doubleVec(bigResult, SIZE);
-		printf("\nGlobal Sum of Squares: %d\nMagnitude: %f\n",globalSumOfSquares, magnitude);
+		printf("\nGlobal Sum of Squares: %d\nMagnitude of BigArray: %f",globalSumOfSquares, magnitude);
+    printf("\nMagnitude of Normalized Vector: %f\n",magnitudeOfNormalized);
 	}
 
 	if(VERBOSE){
@@ -207,7 +224,7 @@ int main(int argc, char *argv[]){
 		printf("\nSliceNorm: ");
 		print_doubleVec(sliceNorm, sliceSize);
 		printf("\nLocal Sum: %d ",sliceSum);
-		printf("\nReceived Global Square Root: %f\n",magnitude);
+		printf("\nReceived Magnitude: %f\n",magnitude);
 	}
 
 	MPI_Finalize();
