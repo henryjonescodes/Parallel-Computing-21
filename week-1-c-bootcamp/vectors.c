@@ -226,6 +226,7 @@ int main(int argc, char *argv[])
   }
 
   if(TEST_DOT_PRODUCT_TIME){
+    clock_t start = clock();
     double * vector1 =  calloc(SIZE,sizeof(double));
     double * vector2 =  calloc(SIZE,sizeof(double));
     if(!CONSTANT_VECTORS){
@@ -249,7 +250,6 @@ int main(int argc, char *argv[])
       print_vector_p(vector2, SIZE);
     }
 
-    clock_t start = clock();
     double product =  dot_product(vector1,vector2, SIZE);
     clock_t thisTime = clock();
     printf("\nvector1 • vector2 = %f",product);
