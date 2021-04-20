@@ -9,7 +9,8 @@
 
 bool VERBOSE = false;
 bool CONSTANT_VECTOR = false;
-int MAX_VALUE = 1000;
+bool PRINT_VECTORS = false;
+int MAX_VALUE = 10;
 int MIN_VALUE = 0;
 
 //to compile: mpicc -std=c99 -Wall MPI_Normalize_Vector.c -o MPI_Normalize_Vector
@@ -100,6 +101,7 @@ double parallel_magnitude(double *vector, int size, int my_rank, int comm_sz){
 
 		//Take square root
 		magnitude = sqrt(globalSumOfSquares);
+    // printf("Magnitude: %f", magnitude);
 	}
   return magnitude;
 }
@@ -143,8 +145,8 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-	//Start the clock
-	// double start_time = MPI_Wtime();
+	// Start the clock
+	double start_time = MPI_Wtime();
 
 	int sliceSize = SIZE/comm_sz;
 	int *slice = malloc(sliceSize*sizeof(int));
@@ -205,18 +207,27 @@ int main(int argc, char *argv[]){
 
 	MPI_Gather(sliceNorm,sliceSize,MPI_DOUBLE,bigResult,sliceSize,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
+  // Stop the clock
+  double end_time = MPI_Wtime();
+  double elapsed = end_time-start_time;
+
   //Test normalization by getting magnitude of the result vector
   double magnitudeOfNormalized = parallel_magnitude(bigResult,SIZE,my_rank, comm_sz);
 
 	//Print stuff
 	if(my_rank == 0){
-		printf("Main Vector: ");
-		print_intVec(bigArray, SIZE);
-		printf("\nNormalized: ");
-		print_doubleVec(bigResult, SIZE);
+    if(PRINT_VECTORS){
+      printf("Main Vector: ");
+      print_intVec(bigArray, SIZE);
+      printf("\nNormalized: ");
+      print_doubleVec(bigResult, SIZE);
+    }
 		printf("\nGlobal Sum of Squares: %d\nMagnitude of BigArray: %f",globalSumOfSquares, magnitude);
     printf("\nMagnitude of Normalized Vector: %f\n",magnitudeOfNormalized);
+    printf("\nThat took %f seconds", elapsed);
 	}
+
+
 
 	if(VERBOSE){
 		printf("\nProcess %d ------>\nSlice: ",my_rank);

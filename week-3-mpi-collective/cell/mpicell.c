@@ -21,17 +21,57 @@ void DistributeLeftAndRightVals(int myID, int numprocs, int *mylocalcells, int l
    int rightID=(myID+1)%numprocs;  //neighbor to your right
    int leftID=(myID-1+numprocs)%numprocs; //neighbor to your left
 
-   int myfirst = mylocalcells[0];
-   int mylast = mylocalcells[localsize-3]; //note that we have to extra cells of padding.
+   printf("Node: %d\nRightID: %d\nLeftID: %d\n", myID, rightID, leftID);
+
+   int *myfirst = malloc(sizeof(int));
+   int *mylast = malloc(sizeof(int)); //note that we have to extra cells of padding.
+
+   myfirst[0] = mylocalcells[0];
+   mylast[0] = mylocalcells[localsize-3]; //note that we have to extra cells of padding.
 
    MPI_Status status;
 
    //CSC-333 inclass: put communication in here!
 	// STEP TWO
-  //replace these lines below with your correct communications
-   *leftval = 0;
+  //replace these lines below with your correct communication
+  //MPI_Sendrecv(sendBuf, sendCount, sendType, dest, sendtag, recvbuf, recvcount, recvtype, source, recvtag, comm, status)
+
+  int destRight = myID + 1;
+  int destLeft = myID - 1;
+  if(myID - 1 < 0){
+    destLeft = numprocs - 1;
+  }
+  else if(myID + 1 > numprocs-1) {
+    destRight = 0;
+  }
+  printf("I am node %d, recieving left from node %d\n", myID, destLeft);
+  printf("I am node %d, recieving right from node %d\n", myID, destRight);
+
+
+
+  // if(leftID < 0){
+  //   MPI_Sendrecv(&myfirst,1,MPI_INT,numprocs,0,&leftval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  // else{
+  //   MPI_Sendrecv(&myfirst,1,MPI_INT,leftID,0,&leftval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  // if(rightID > numprocs*(localsize - 2)){
+  //   MPI_Sendrecv(&mylast,1,MPI_INT,0,0,&rightval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  // else{
+  //   MPI_Sendrecv(&mylast,1,MPI_INT,rightID,0,&rightval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  printf("My Rank: %d\nMy left: %d\nMy right: %d", myID, destLeft, destRight);
+  MPI_Sendrecv(myfirst,1,MPI_INT,destLeft,0,
+              &leftval,1,MPI_INT,destLeft,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+
+  MPI_Sendrecv(mylast,1,MPI_INT,destRight,0,
+              &rightval,1,MPI_INT,destRight,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+
+
+   // *leftval = 0;
    *rightval = 0;
-   // printf("I am node %d, I got %d from left node %d and %d from right node %d\n", myID,*leftval,leftID,*rightval,rightID);
+   printf("I am node %d, I got %d from left node %d and %d from right node %d\n", myID,*leftval,leftID,*rightval,rightID);
 
 }
 
@@ -111,7 +151,7 @@ int main(int argc, char *argv[])
 	     MPI_Finalize();
 	     exit(1);
    }
-   //everyone creates their own pointer to the world 
+   //everyone creates their own pointer to the world
   // so that collective communication calls work
    int *mycellworld;
 
@@ -127,6 +167,8 @@ int main(int argc, char *argv[])
    //scatter global copy to rest of nodes' local world
    // CSC-333 inclass: put code here
 	// STEP ONE
+
+  MPI_Scatter(mycellworld,localsize,MPI_INT,localcells,localsize,MPI_INT,0,MPI_COMM_WORLD);
 
   // NOTE: you want to scatter
   // LOCALSIZE-sized chunks of the world from the root node

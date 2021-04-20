@@ -6,6 +6,13 @@ factors
 MPI_array_sum
 MPI_vector_dot
 MPI_Normalize_Vector
+mpicell
+
+# Object files
+2DCellAut.o
+CellAut.o
+mpicell.o
+
 
 # Other stuff
 .DS_Store
