@@ -44,21 +44,21 @@ My other test used vectors with `SIZE = 100000` again on both programs. With lar
 
 # Feedback from John
 
-## Array Sum
+## Array Sum 10/10
 - [] Code Exists
 - [] Code Compiles
 - [] Code Runs
 - [] Writeup and Analysis
 - Notes:
 
-## Vector Dot
+## Vector Dot 8/10
 - [] Code Exists
 - [] Code Compiles
 - [] Code Runs
-- [] Writeup and Analysis
-- Notes:
+- [] Writeup and Analysis -8
+- Notes: I would have liked to see a more thorough writeup and analysis with tabular data.  Bummed you didn't try vector add!
 
-##  Vector Add
+##  Vector Add 0/5
 - [] Code Exists
 - [] Code Compiles
 - [] Code Runs
