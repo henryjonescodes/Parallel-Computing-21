@@ -3,7 +3,6 @@
 #include <string.h>
 #include "CellAut.h"
 #include "mpi.h"
-
 /* mpicell.c
  author: John Rieffel
 */
@@ -22,46 +21,57 @@ void DistributeLeftAndRightVals(int myID, int numprocs, int *mylocalcells, int l
    int rightID=(myID+1)%numprocs;  //neighbor to your right
    int leftID=(myID-1+numprocs)%numprocs; //neighbor to your left
 
-   int myfirst = mylocalcells[0];
-   int mylast = mylocalcells[localsize-3]; //note that we have to extra cells of padding.
+   printf("Node: %d\nRightID: %d\nLeftID: %d\n", myID, rightID, leftID);
+
+   int *myfirst = malloc(sizeof(int));
+   int *mylast = malloc(sizeof(int)); //note that we have to extra cells of padding.
+
+   myfirst[0] = mylocalcells[0];
+   mylast[0] = mylocalcells[localsize-3]; //note that we have to extra cells of padding.
 
    MPI_Status status;
 
-   if(myID-1 < 0){
-     leftID = numprocs - 1;
-   }
-   if(myID + 1 > numprocs-1){
-     rightID = 0;
-   }
-
-   // printf("I am node %d, recieving left from node %d\nrecieving right from node %d\n", myID, leftID,rightID);
-
    //CSC-333 inclass: put communication in here!
 	// STEP TWO
-  //replace these lines below with your correct communications
+  //replace these lines below with your correct communication
+  //MPI_Sendrecv(sendBuf, sendCount, sendType, dest, sendtag, recvbuf, recvcount, recvtype, source, recvtag, comm, status)
 
-  if(myID % 2 == 0){
-    //Send and recieve to the right
-    MPI_Send(&mylast,1,MPI_INT,rightID,0,MPI_COMM_WORLD);
-    MPI_Recv(rightval,1,MPI_INT,rightID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-
-    //Send and recieve to the left
-    MPI_Send(&myfirst,1,MPI_INT,leftID,0,MPI_COMM_WORLD);
-    MPI_Recv(leftval,1,MPI_INT,leftID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-  } else {
-    //Revieve and send to the left
-    MPI_Recv(leftval,1,MPI_INT,leftID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-    MPI_Send(&myfirst,1,MPI_INT,leftID,0,MPI_COMM_WORLD);
-
-    //Revieve and send to the right
-    MPI_Recv(rightval,1,MPI_INT,rightID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-    MPI_Send(&mylast,1,MPI_INT,rightID,0,MPI_COMM_WORLD);
+  int destRight = myID + 1;
+  int destLeft = myID - 1;
+  if(myID - 1 < 0){
+    destLeft = numprocs - 1;
   }
+  else if(myID + 1 > numprocs-1) {
+    destRight = 0;
+  }
+  printf("I am node %d, recieving left from node %d\n", myID, destLeft);
+  printf("I am node %d, recieving right from node %d\n", myID, destRight);
+
+
+
+  // if(leftID < 0){
+  //   MPI_Sendrecv(&myfirst,1,MPI_INT,numprocs,0,&leftval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  // else{
+  //   MPI_Sendrecv(&myfirst,1,MPI_INT,leftID,0,&leftval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  // if(rightID > numprocs*(localsize - 2)){
+  //   MPI_Sendrecv(&mylast,1,MPI_INT,0,0,&rightval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  // else{
+  //   MPI_Sendrecv(&mylast,1,MPI_INT,rightID,0,&rightval,1,MPI_INT,myID,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  // }
+  printf("My Rank: %d\nMy left: %d\nMy right: %d", myID, destLeft, destRight);
+  MPI_Sendrecv(&myfirst,1,MPI_INT,destLeft,0,
+              leftval,1,MPI_INT,destLeft,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+
+  MPI_Sendrecv(&mylast,1,MPI_INT,destRight,0,
+              rightval,1,MPI_INT,destRight,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
 
    // *leftval = 0;
-   // *rightval = 0;
-   // printf("I am node %d, I got %d from left node %d and %d from right node %d\n", myID,*leftval,leftID,*rightval,rightID);
+   *rightval = 0;
+   printf("I am node %d, I got %d from left node %d and %d from right node %d\n", myID,*leftval,leftID,*rightval,rightID);
 
 }
 
@@ -97,7 +107,6 @@ void MPIRunCellWorld(int myID, int numprocs, int *localcells, int sizeOfMyWorld,
        int locali = 0;
        for (locali = 0; locali < sizeOfMyWorld; locali++) {
 	        ApplyRuleAtLoc(localcells,newcells,locali,sizeOfMyWorld,rule);
-          // printWorld(localcells,sizeOfMyWorld,myID);
         }
        // the world becomes the new world
        // and new world becomes the old world
@@ -121,44 +130,14 @@ int main(int argc, char *argv[])
    MPI_Comm_rank (MPI_COMM_WORLD, &id);
    MPI_Comm_size (MPI_COMM_WORLD, &p);
 
-   int PRINT_FLAG = 0;
    int WORLDSIZE = 128;
-   int iterstep = 1;
-   int curiters = 0;
-   int maxiters = 100;
-   int rule = 30;
 
-    if (argc > 1) {
-      rule = atoi(argv[1]);
-      if (argc > 2 )
-      {
-          WORLDSIZE = atoi(argv[2]);
-          if (argc > 3)
-          {
-              maxiters = atoi(argv[3]);
-              if (argc > 4)
-              {
-                int flag1 = atoi(argv[4]);
-                if(flag1 != 1 && flag1 != 0){
-                  printf("print flag must be binary");
-                } else {
-                  PRINT_FLAG = flag1;
-                }
-              }
-          }
-      }
-    }
-    else{
-      printf("usage: runcell <rulenumber>\n");
-      printf("usage: runcell <rulenumber> <worldsize>\n");
-      printf("usage: runcell <rulenumber> <worldsize> <maxiters>\n");
-      printf("usage: runcell <rulenumber> <worldsize> <maxiters> <printflag>\n");
-    }
+   int *localcells; //local array
+   int localsize = (WORLDSIZE/p); //how many items you care about
+   int paddedsize = localsize + 2;  //a
+                                    //plus two extra indexes, one for each neighbor
 
-  int *localcells; //local array
-  int localsize = (WORLDSIZE/p); //how many items you care about
-  int paddedsize = localsize + 2;  //a
-                                   //plus two extra indexes, one for each neighbor
+   printf("node :%d, worldsize: %d, localsize: %d\n",id,WORLDSIZE,localsize);
 
    if (WORLDSIZE%p != 0)
      {
@@ -173,18 +152,14 @@ int main(int argc, char *argv[])
 	     exit(1);
    }
    //everyone creates their own pointer to the world
-   // so that collective communication calls work
+  // so that collective communication calls work
    int *mycellworld;
 
-   // but only the root node actually needs to allocate
+  // but only the root node actually needs to allocate
    if (id == 0)
      {
-       printf("node :%d, worldsize: %d, localsize: %d maxiters: %d \n",id,WORLDSIZE,localsize,maxiters);
        mycellworld = MakeCellWorld(WORLDSIZE);
        InitCellWorld(mycellworld,WORLDSIZE);
-       if(PRINT_FLAG == 1){
-         printWorld(mycellworld,WORLDSIZE,id);
-       }
      }
 
 
@@ -195,7 +170,6 @@ int main(int argc, char *argv[])
 
   MPI_Scatter(mycellworld,localsize,MPI_INT,localcells,localsize,MPI_INT,0,MPI_COMM_WORLD);
 
-
   // NOTE: you want to scatter
   // LOCALSIZE-sized chunks of the world from the root node
   // to each node
@@ -203,9 +177,15 @@ int main(int argc, char *argv[])
   // into an array of size N+2)
 
    //now everyone has their own slice of the world!
-   //
-   // printf("I am node %d, my local world is now:\n",id);
-   // printWorld(localcells,localsize,id);
+
+   printf("I am node %d, my local world is now:\n",id);
+   printWorld(localcells,localsize,id);
+
+
+   int iterstep = 1;
+   int curiters = 0;
+   int maxiters = 100;
+   int rule = 30;
 
    for (curiters = 0; curiters < maxiters; curiters++)
      {
@@ -226,20 +206,12 @@ int main(int argc, char *argv[])
        // Warning your code won't get much speedup if you call this every iteration!
 		 // STEP THREE
 
-     if (PRINT_FLAG == 1){
-      MPI_Gather(localcells, localsize, MPI_INT, mycellworld,localsize,MPI_INT, 0, MPI_COMM_WORLD);
-      if (id == 0)
-    	  {
-    	    printWorld(mycellworld,WORLDSIZE,id);
-    	  }
+	if (id == 0)
+	  {
+	    //    printf("results of gather on node 0\n");
+	    printWorld(mycellworld,WORLDSIZE,id);
+	  }
      }
-  }
-	if (PRINT_FLAG == 0){
-    MPI_Gather(localcells, localsize, MPI_INT, mycellworld,localsize,MPI_INT, 0, MPI_COMM_WORLD);
-    if (id == 0)
-  	  {
-  	    printWorld(mycellworld,WORLDSIZE,id);
-  	  }
-  }
-  MPI_Finalize();
+
+   MPI_Finalize();
 }
