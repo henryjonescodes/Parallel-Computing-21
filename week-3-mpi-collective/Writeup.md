@@ -1,9 +1,10 @@
 # <center>Week 3 Assignments</center>
+### <center>Henry Jones</center>
 
 # Tasks
 
 - [X] Normalize Vector
-- [ ] Parallelized 1-D Automaton
+- [X] Parallelized 1-D Automaton
 
 # Observations and Measures
 
@@ -24,10 +25,26 @@ Four Processes | #1 | #2 | #3 | #4 | #5
 --- | --- | --- | --- |--- |---
 Time(s) | 0.181450 | 0.182311 | 0.187043 | 0.185031 | 0.190632
 
-Average (mean): 0.1852934
+Average (mean): 0.1852934 seconds
 
 Average Speedup: 1.4999562
 
 ## Parallelized 1-D Automaton
 
-Progress (April 19th): This is a frustrating one. I have the processes correctly choosing their reciving and fetching nodes but I'm currently trying to get `MPI_sendRecv()` for me without causing segmentation faults.
+My communication scheme uses blocking `MPI_Send()` and `MPI_Recv()` to pass messages, but staggers the communication based on the processor number, either even or odd. Even processors begin by sending then recieving from the 'right', followed by sending and recieving to the 'left', odd processors do the opposite. This allows the program to run smoothly (given P/ID == 0) despite the blocking functions.
+
+For timing I used a `WORLDSIZE = 260` and `maxiters = 1,000,000` with rule 30 on 1 and 4 processes respectively. I timed most of the main function, from just after command line imput is interpreted up until before the single `printWorld` call near the end of the file.
+
+One Process | #1 | #2 | #3 | #4 | #5
+--- | --- | --- | --- |--- |---
+Time(s) | 7.270382 | 7.307137 | 7.283688 | 7.252132 | 7.219669
+
+Average (mean): 7.2666016 seconds
+
+Four Processes | #1 | #2 | #3 | #4 | #5
+--- | --- | --- | --- |--- |---
+Time(s) | 3.121701 | 3.095834 | 3.078397 | 3.077086 | 3.173466
+
+Average (mean): 3.1092968 seconds
+
+Average Speedup: 2.33705627

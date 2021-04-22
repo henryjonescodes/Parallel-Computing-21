@@ -1,6 +1,6 @@
 #include "CellAut.h"
 
-//Note to future self: 
+//Note to future self:
 // this would be much better if we operated on arrays of char
 // (4x less memory)
 
@@ -69,7 +69,12 @@ void printWorld(int *world, int worldsize, int myid)
     {
       //if (world[i] != Nil){
     //    if (world[i] == 1) printf("#");
-  	printf("%d",world[i]);
+  	// printf("%d",world[i]);
+    if(world[i] == 1){
+      printf("✿");
+    } else if (world[i] == 0){
+      printf("▫");
+    }
      //   else printf(" ");
        //}
     }

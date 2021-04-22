@@ -79,7 +79,15 @@ void MPIRunCellWorld(int myID, int numprocs, int *localcells, int sizeOfMyWorld,
       // after calling this
       // the variables leftval and rightval
       // should have the values from the neighboring worlds.
+
+       // double distribute_start_time = MPI_Wtime();
+
        DistributeLeftAndRightVals(myID,numprocs, localcells, sizeOfMyWorld, &leftval, &rightval);
+
+       // double distribute_end_time = MPI_Wtime();
+       // double elapsed = distribute_end_time = distribute_start_time;
+       //
+       // printf("\n(%d:%d): Distribution took (seconds): %f",myID, numprocs, elapsed);
 
 
        // shouldn't have to touch this, it should just work
@@ -153,7 +161,11 @@ int main(int argc, char *argv[])
       printf("usage: runcell <rulenumber> <worldsize>\n");
       printf("usage: runcell <rulenumber> <worldsize> <maxiters>\n");
       printf("usage: runcell <rulenumber> <worldsize> <maxiters> <printflag>\n");
+      MPI_Finalize();
+      exit(1);
     }
+
+  // double start_time = MPI_Wtime();
 
   int *localcells; //local array
   int localsize = (WORLDSIZE/p); //how many items you care about
@@ -172,6 +184,7 @@ int main(int argc, char *argv[])
 	     MPI_Finalize();
 	     exit(1);
    }
+
    //everyone creates their own pointer to the world
    // so that collective communication calls work
    int *mycellworld;
@@ -179,7 +192,7 @@ int main(int argc, char *argv[])
    // but only the root node actually needs to allocate
    if (id == 0)
      {
-       printf("node :%d, worldsize: %d, localsize: %d maxiters: %d \n",id,WORLDSIZE,localsize,maxiters);
+       printf("(%d:%d): worldsize: %d, localsize: %d maxiters: %d \n",id,p,WORLDSIZE,localsize,maxiters);
        mycellworld = MakeCellWorld(WORLDSIZE);
        InitCellWorld(mycellworld,WORLDSIZE);
        if(PRINT_FLAG == 1){
@@ -226,8 +239,8 @@ int main(int argc, char *argv[])
        // Warning your code won't get much speedup if you call this every iteration!
 		 // STEP THREE
 
-     if (PRINT_FLAG == 1){
-      MPI_Gather(localcells, localsize, MPI_INT, mycellworld,localsize,MPI_INT, 0, MPI_COMM_WORLD);
+      if (PRINT_FLAG == 1){
+          MPI_Gather(localcells, localsize, MPI_INT, mycellworld,localsize,MPI_INT, 0, MPI_COMM_WORLD);
       if (id == 0)
     	  {
     	    printWorld(mycellworld,WORLDSIZE,id);
@@ -236,10 +249,15 @@ int main(int argc, char *argv[])
   }
 	if (PRINT_FLAG == 0){
     MPI_Gather(localcells, localsize, MPI_INT, mycellworld,localsize,MPI_INT, 0, MPI_COMM_WORLD);
+    // double end_time = MPI_Wtime();
+    // double elapsed = end_time - start_time;
+
     if (id == 0)
   	  {
   	    printWorld(mycellworld,WORLDSIZE,id);
+        // printf("(%d:%d): That took (seconds): %f\n",id,p,elapsed);
   	  }
   }
+
   MPI_Finalize();
 }
