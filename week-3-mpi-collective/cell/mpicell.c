@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
    int maxiters = 100;
    int rule = 30;
 
-    if (argc > 1) {
+    if (argc > 1 && argc <= 5) {
       rule = atoi(argv[1]);
       if (argc > 2 )
       {

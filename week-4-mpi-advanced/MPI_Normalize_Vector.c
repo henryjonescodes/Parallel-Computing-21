@@ -8,8 +8,8 @@
 #include <math.h>
 
 bool VERBOSE = false;
-bool CONSTANT_VECTOR = true;
-bool PRINT_VECTORS = true;
+bool CONSTANT_VECTOR = false;
+bool PRINT_VECTORS = false;
 int MAX_VALUE = 10;
 int MIN_VALUE = 0;
 
@@ -55,9 +55,9 @@ int * randomize_intVec(int *vec, int size)
 
 double * normalize_vector(int *vec, double *result, int size, double magnitude)
 {
-	int *p;
-	double *p2;
-	int * vec_end = vec+size;
+	  int *p;
+	  double *p2;
+	  int * vec_end = vec+size;
   	double * result_end = result+size;
   	for (p = vec, p2 = result; (p < vec_end && p2 < result_end); p++, p2++)
   	{
@@ -66,56 +66,40 @@ double * normalize_vector(int *vec, double *result, int size, double magnitude)
 	return result;
 }
 
-double parallel_double_magnitude(double *vector, int size, int my_rank, int comm_sz){
-  int sliceSize = size/comm_sz;
-	double *slice = malloc(sliceSize*sizeof(double));
+double parallel_double_ss(double *bigVec, double *vec, int size){
+  MPI_Scatter(bigVec,size,MPI_DOUBLE,vec,size,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-	double globalSumOfSquares = 0;
-	double sliceSum = 0;
-	double magnitude = 0;
+  double sum = 0;
+  double tempSum = 0;
 
-  //Send slices to all processes
-	MPI_Scatter(vector,sliceSize,MPI_DOUBLE,slice,sliceSize,MPI_DOUBLE,0,MPI_COMM_WORLD);
-
-	//Calculate local sum of squares
+  //Calculate local sum of squares
 	int i;
-	for(i=0; i< sliceSize; i++){
-		double tmp = slice[i];
-		sliceSum += (tmp * tmp);
+	for(i=0; i< size; i++){
+		double tmp = vec[i];
+		tempSum += (tmp * tmp);
 	}
 
-  MPI_Allreduce(&sliceSum, &globalSumOfSquares, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-  if(my_rank == 0){
-    magnitude = sqrt(globalSumOfSquares);
-  }
-  return magnitude;
+  //Reduce and produce
+  MPI_Allreduce(&tempSum, &sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  return sum;
 }
 
-double parallel_integer_magnitude(int *vector, int size, int my_rank, int comm_sz){
-  int sliceSize = size/comm_sz;
-	int *slice = malloc(sliceSize*sizeof(int));
+int parallel_integer_ss(int *bigVec, int *vec, int size){
+  MPI_Scatter(bigVec,size,MPI_INT,vec,size,MPI_INT,0,MPI_COMM_WORLD);
 
-	int globalSumOfSquares = 0;
-	int sliceSum = 0;
-	double magnitude = 0;
+  int sum = 0;
+  int tempSum = 0;
 
-  //Send slices to all processes
-	MPI_Scatter(vector,sliceSize,MPI_INT,slice,sliceSize,MPI_INT,0,MPI_COMM_WORLD);
-
-	//Calculate local sum of squares
+  //Calculate local sum of squares
 	int i;
-	for(i=0; i< sliceSize; i++){
-		int tmp = slice[i];
-		sliceSum += (tmp * tmp);
+	for(i=0; i< size; i++){
+		int tmp = vec[i];
+		tempSum += (tmp * tmp);
 	}
 
-  MPI_Allreduce(&sliceSum, &globalSumOfSquares, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
-  if(my_rank == 0){
-    magnitude = sqrt(globalSumOfSquares);
-  }
-  return magnitude;
+  //Reduce and produce
+  MPI_Allreduce(&tempSum, &sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  return sum;
 }
 
 int main(int argc, char *argv[]){
@@ -142,7 +126,7 @@ int main(int argc, char *argv[]){
 	int SIZE = 0;
 	if (argc != 2){
 		if(my_rank == 0){
-			printf("usage: MPI_vector_dot <size>\n ");
+			printf("usage: MPI_Normalize_Vector <size>\n ");
 		}
 		exit(1);
 	}
@@ -163,8 +147,8 @@ int main(int argc, char *argv[]){
 	int sliceSize = SIZE/comm_sz;
 	int *slice = malloc(sliceSize*sizeof(int));
 	double *sliceNorm = malloc(sliceSize*sizeof(double));
-	int *bigArray;
-	double *bigResult;
+	int *bigArray = malloc(SIZE*sizeof(int));
+	double *bigResult = malloc(SIZE*sizeof(double));
 
 	int globalSumOfSquares = 0;
 	int sliceSum = 0;
@@ -174,59 +158,37 @@ int main(int argc, char *argv[]){
 	if (my_rank == 0)
 	{
 		//Make the random vector
-		bigArray = malloc(SIZE*sizeof(int));
 		bigArray = randomize_intVec(bigArray, SIZE);
-
-    //And the result vector
-    bigResult = malloc(SIZE*sizeof(double));
 	}
 
-  // magnitude = parallel_integer_magnitude(bigArray,SIZE,my_rank,comm_sz);
+  globalSumOfSquares = parallel_integer_ss(bigArray, slice, sliceSize);
 
-  //Send slices to all processes
-	MPI_Scatter(bigArray,sliceSize,MPI_INT,slice,sliceSize,MPI_INT,0,MPI_COMM_WORLD);
-
-	//Calculate local sum of squares
-	int i;
-	for(i=0; i< sliceSize; i++){
-		int tmp = slice[i];
-		sliceSum += (tmp * tmp);
-	}
-
-	//Only non-roots need to send back
-	if(my_rank != 0){
-		MPI_Send(&sliceSum,1,MPI_INT,0,0,MPI_COMM_WORLD);
-	} else {
-		//Add root process's work
-		globalSumOfSquares = globalSumOfSquares + sliceSum;
-
-		//Add local sums from non root nodes
-		int src;
-		for(src = 1; src < comm_sz; src++){
-			int tmp;
-			MPI_Recv(&tmp,1,MPI_INT,src,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			globalSumOfSquares = globalSumOfSquares + tmp;
-		}
-		//Take square root
-		magnitude = sqrt(globalSumOfSquares);
-	}
+  if(my_rank == 0){
+    magnitude = sqrt(globalSumOfSquares);
+  }
 
 	//Broadcast magnitude to nodes
 	MPI_Bcast(&magnitude,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-	//Calculate local sum of squares (dont divide by zero)
+  //Normalize vector slices
 	if(magnitude > 0){
 		sliceNorm = normalize_vector(slice, sliceNorm, sliceSize, magnitude);
 	}
 
 	MPI_Gather(sliceNorm,sliceSize,MPI_DOUBLE,bigResult,sliceSize,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-  // Stop the clock
+  //Stop the clock
   double end_time = MPI_Wtime();
   double elapsed = end_time-start_time;
 
-  //Test normalization by getting magnitude of the result vector
-  double magnitudeOfNormalized = parallel_double_magnitude(bigResult,SIZE,my_rank, comm_sz);
+  double *newSlice = malloc(sliceSize*sizeof(double));
+  double magnitudeOfNormalized = 0;
+
+  double ss_of_normalized = parallel_double_ss(bigResult, newSlice, sliceSize);
+
+  if(my_rank == 0){
+    magnitudeOfNormalized = sqrt(ss_of_normalized);
+  }
 
 	//Print stuff
 	if(my_rank == 0){
@@ -238,10 +200,8 @@ int main(int argc, char *argv[]){
     }
 		printf("\nGlobal Sum of Squares: %d\nMagnitude of BigArray: %f",globalSumOfSquares, magnitude);
     printf("\nMagnitude of Normalized Vector: %f\n",magnitudeOfNormalized);
-    printf("\nThat took %f seconds", elapsed);
+    printf("\nThat took (seconds): %f", elapsed);
 	}
-
-
 
 	if(VERBOSE){
 		printf("\nProcess %d ------>\nSlice: ",my_rank);

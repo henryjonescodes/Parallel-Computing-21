@@ -6,6 +6,9 @@ factors
 MPI_array_sum
 MPI_vector_dot
 MPI_Normalize_Vector
+MPI_Vector_STD
+MPI_Vector_Mean
+MPI_LOS
 mpicell
 
 # Object files
