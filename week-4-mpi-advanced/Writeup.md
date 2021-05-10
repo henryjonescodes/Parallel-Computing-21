@@ -6,6 +6,7 @@
 - [X] Normalize Vector using Reduce
 - [X] Vector Mean
 - [X] Vector Standard Deviation
+- [X] Line of Sight
 
 # Observations and Measures
 
@@ -49,3 +50,16 @@ For my tests I tried vectors with `size = 1,000,000,000` on 4 and 1 processes, t
 | 4 Processes    | 4.408949  | 4.373965  | 5.069144  | 5.023227  | 4.356653  | 4.6463876 |
 
 Speedup (4 cores): 3.988354135586967
+
+## Line of Sight
+
+For line of sight I contributed all changes to my code as I did it my self. Timing was taken before data allocation and after all MPI calls running on my Mac.
+
+| MPI_LOS     | #1       | #2       | #3       | #4       | #5       | Average (Mean) |
+|-------------|----------|----------|----------|----------|----------|----------------|
+| One Process | 0.000200 | 0.000226 | 0.000175 | 0.000167 | 0.000236 | 0.0002008 |
+| 4 Processes | 0.000562 | 0.000521 | 0.000575 | 0.000552 | 0.000505 | 0.000543 |
+
+Speedup (4 cores): .3697974217
+
+![](LOS.png)

@@ -3,8 +3,11 @@
 #include <stdio.h>
 #include <time.h> //for random seed
 #include <math.h> //need to compile with -m
-//to compile: mpicc -std=c99 -Wall MPI_blank_template.c -o MPI_blank
-//to run (simple): mpirun ./MPI_blank
+
+//to compile: mpicc -std=c99 -Wall MPI_LOS.c -o MPI_LOS
+//to run (simple): mpirun ./MPI_LOS
+//to run (multi-process): mpirun -np 4 ./MPI_LOS
+
 
 #define INITIAL_HEIGHT 100
 #define DX 100
@@ -39,7 +42,7 @@ void PrintTerrain(int *localworld, int localsize,int my_rank)
 	for (i = 0; i < localsize; i++)
 			printf("(%d,%d),", (DX*i)+offset, localworld[i]);
     printf("\n");
-    
+
 }
 /*
 Calculate Angles:
@@ -119,6 +122,9 @@ int main(int argc, char *argv[]){
 
 	srand(time(NULL) + my_rank);
 
+	// Start the clock
+	double start_time = MPI_Wtime();
+
 	int WORLDSIZE = 20;
 	int mysize = WORLDSIZE/num_procs;
 
@@ -135,7 +141,7 @@ int main(int argc, char *argv[]){
 
 	//int sum = localworld[0];
 
-	//exclusive prefix scan gives every node prefix operator applied to all PRIOR 
+	//exclusive prefix scan gives every node prefix operator applied to all PRIOR
 	//nodes, but not to itself.
 	// eg prefix scan [1,2,3,4] -> [2,4,7,11]
 	// vs exscan      [1,2,3,4] -> [1,3,6,10]
@@ -144,11 +150,17 @@ int main(int argc, char *argv[]){
 	// and add it as an offset to everything in my terrain
 	int offset = 0;
 	//call exscan here
+	MPI_Exscan(&localworld[mysize-1], &offset, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
 
 	//debug print to verify excan worked
 	printf("%d offset %d\n", my_rank, offset);
-	// PART 1: 
+	// PART 1:
 	// next correct altitudes based upon received offset
+	int z;
+	for(z = 0; z < mysize; z++){
+		localworld[z] = localworld[z] + offset;
+	}
 
 	//debug print to verify altitudes are corrected
 	PrintTerrain(localworld,mysize,my_rank);
@@ -165,9 +177,10 @@ int main(int argc, char *argv[]){
 
 	//STEP 2: use exscan again to find the *max* value of every node'
 	// maxangles array (the last value)
-	double scanmax = 0;	
+	double scanmax = 0;
 
 	//call excan here
+	MPI_Exscan(&maxangles[mysize-1], &scanmax, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
 	//debugginb print
 	printf("%d max is %f, scanmax is %f \n",my_rank,maxangles[mysize-1],scanmax);
@@ -185,6 +198,7 @@ int main(int argc, char *argv[]){
 
     //Step 3: gather the world and the visibility array here
 
+	MPI_Gather(visible, mysize, MPI_CHAR, globalvis, mysize, MPI_CHAR, 0, MPI_COMM_WORLD);
 
 	if (my_rank == 0)
 	{
@@ -193,9 +207,13 @@ int main(int argc, char *argv[]){
 	    printf("\n");
 	}
 
+	// End the clock
+	double end_time = MPI_Wtime();
 
-
-
+	if (my_rank == 0)
+	{
+		printf("That Took (seconds): %f", end_time-start_time);
+	}
 
 	MPI_Finalize();
 	//please no MPI stuff after this line
