@@ -38,6 +38,8 @@ For my tests I tried vectors with `size = 1,000,000,000` on 4 and 1 processes, t
 
 Speedup (4 cores): 3.980024604915956
 
+This speedup is probably due to the simplistic nature of the problem, as the size of the data went up, there wasn't an additional tax from communication and the processes generally should calculate their portion of the problem efficiently. Therefore, significant speedup occoured since the communication takes a small fraction of time when the input size is huge and that input was effectivly quartered by assigning it to 4 processes.
+
 ## Vector Standard Deviation
 
 For vector standard deviation I utilized both `MPI_Allreduce()` and `MPI_reduce()` to commmunicate. First `MPI_Allreduce()` is used to distrubute the sum of all values to all nodes. Then, after a partial sum of squares is generated one each node `MPI_reduce()` is used to accumulate the global sum of squares which is opperated on by node 0 to get the actual standard deviation.
@@ -51,6 +53,8 @@ For my tests I tried vectors with `size = 1,000,000,000` on 4 and 1 processes, t
 
 Speedup (4 cores): 3.988354135586967
 
+Again, the speedup here is very large. This is once again a communication thing. Standard deviation with large sized arrays is an effective use of parallelization because it too can quarter its data (on 4 processes) and has relativly negligable communication cost when size increases.
+
 ## Line of Sight
 
 For line of sight I contributed all changes to my code as I did it my self. Timing was taken before data allocation and after all MPI calls running on my Mac.
@@ -61,5 +65,9 @@ For line of sight I contributed all changes to my code as I did it my self. Timi
 | 4 Processes | 0.000562 | 0.000521 | 0.000575 | 0.000552 | 0.000505 | 0.000543 |
 
 Speedup (4 cores): .3697974217
+
+Unlike the other two problems in this set, the speedup here is minimal. This is the inverse of what's happening in the other two as communication plays a large role in the algorithm. Expecially here with such a small world, each process spends a large amount of 'energy' dealing with communication. Perhaps with a larger world size this would make sense to paralellize, but here its simply moot.
+
+Using the provided python code, I was able to generate pretty graphs like the one below consistently which I used to check if things were going as planned.
 
 ![](LOS.png)
