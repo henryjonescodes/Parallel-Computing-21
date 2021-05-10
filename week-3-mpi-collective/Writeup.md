@@ -48,3 +48,30 @@ Time(s) | 3.121701 | 3.095834 | 3.078397 | 3.077086 | 3.173466
 Average (mean): 3.1092968 seconds
 
 Average Speedup: 2.33705627
+
+# Feedback
+
+Normalize: 10/10
+- [+] Code Exists
+- [+] Code Compiles
+- [+] Code Runs
+- [+] Writeup and Analysis
+- Notes: 
+
+Cell: 29/29
+- [+] Code Exists
+- [+] Code Compiles
+- [+] Code Runs
+- [+] Writeup and Analysis
+- Notes: 
+
+Challenge: 1/1
+- [+] Code Exists
+- [+] Code Compiles
+- [+] Code Runs
+- [+] Writeup and Analysis
+- Notes:  pretty flowers!
+
+Total: 40
+
+Overall: A good and generally thorough writeup.  In the future I'd like to see a bit more data, and a bit more insight into *why* speedup is or isn't achieved.
