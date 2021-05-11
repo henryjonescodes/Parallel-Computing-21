@@ -129,6 +129,7 @@ int main(int argc, char *argv[]){
 	int mysize = WORLDSIZE/num_procs;
 
 	int * localworld = malloc(mysize*sizeof(int));
+	int * globalworld = malloc(WORLDSIZE*sizeof(int));
 
 	int i;
 	int upper = 2;
@@ -196,15 +197,23 @@ int main(int argc, char *argv[]){
 
 	char * globalvis = malloc(WORLDSIZE*sizeof(char));
 
-    //Step 3: gather the world and the visibility array here
+  //Step 3: gather the world and the visibility array here
 
 	MPI_Gather(visible, mysize, MPI_CHAR, globalvis, mysize, MPI_CHAR, 0, MPI_COMM_WORLD);
 
+	MPI_Gather(localworld, mysize, MPI_INT, globalworld, mysize, MPI_INT, 0, MPI_COMM_WORLD);
+
 	if (my_rank == 0)
 	{
-		for (i = 0; i < WORLDSIZE; i++)
+		printf("\n(0): Output \n");
+		for (i = 0; i < WORLDSIZE; i++){
 			printf("%d",globalvis[i]);
-	    printf("\n");
+		}
+		printf("\n");
+		for (i = 0; i < mysize*num_procs; i++){
+			printf("(%d,%d),", (DX*i), globalworld[i]);
+		}
+	  printf("\n");
 	}
 
 	// End the clock
