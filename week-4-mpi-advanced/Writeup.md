@@ -71,3 +71,37 @@ Unlike the other two problems in this set, the speedup here is minimal. This is 
 Using the provided python code, I was able to generate pretty graphs like the one below consistently which I used to check if things were going as planned.
 
 ![](LOS.png)
+
+# Feedback
+
+Normalize v2: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
+
+Mean: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
+
+STD: 10/10 
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
+
+- Notes for Vector Ops: good work, although I'd prefer to see your tables laid out more clearly.
+
+---
+
+LOS: 27/30
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [-] Writeup and Analysis
+- Notes:  You'll find that if you use MUCH bigger worlds you'll see speedups.  Be sure to graph them!
+
+Total:  57/60
+Overall: nice work. You can get +2 points with revisions. 
