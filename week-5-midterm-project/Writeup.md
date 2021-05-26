@@ -2,4 +2,4 @@
 
 See my contributions on Theo Seidel's [Repo](https://cs-gitlab.union.edu/seidelt/2d-cellular-automata).
 
-[Go Home](/../../)
+[Go Home](/../../jonesh-csc333-s21)
