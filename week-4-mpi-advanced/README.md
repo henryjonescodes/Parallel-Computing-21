@@ -1,4 +1,4 @@
-<center>Week 4: Advanced MPI</center>
+# <center>Week 4: Advanced MPI</center>
 
 # Introduction
 
@@ -15,7 +15,7 @@ This week we learned advanced MPI collective communication, most importantly `MP
 
 ## Vector Mean
 
-* Similarly, create an `MPI_Vector_Mean.c` and use the collective communication tools to calculate the mean of a vector. 
+* Similarly, create an `MPI_Vector_Mean.c` and use the collective communication tools to calculate the mean of a vector.
 * Each task should create its *own* local array with random values, and then calculate the local sum.
 * Task 0 should then use `MPI_Reduce` to accumulate the local sums.
 * time your code across several tasks and vector sizes.  Make a note in your `Writeup.md`
@@ -27,7 +27,7 @@ Now we'll implement standard deviation using the formula and method discussed in
 * Next create an `MPI_Vector_STD.c` Using the standard deviation formula.
 * Each task should create its own random vector and calculate its local sum
 * Each task should use `MPI_Allreduce` to obtain the global sum, and use that to calculate the global mean
-* Each task should calculate its local sum of squared differences (squared distance between the value at every index and the global mean) 
+* Each task should calculate its local sum of squared differences (squared distance between the value at every index and the global mean)
 * Task 0 should then Reduce these local sum squared differences to calculate the standard deviation.
 
 
@@ -51,8 +51,8 @@ Specifically we need to calculate the node-wise exclusive prefix sum of the last
 
 * Task 0's altitude remains unchanged
 * Task 1 altitudes += Task 0's last altitude
-* Taks 2 altitudes += (Task 0's last + Task 1's last) 
-* Task 3 altitudes += (Task 0's last + Task 1's last + Task 2's) 
+* Taks 2 altitudes += (Task 0's last + Task 1's last)
+* Task 3 altitudes += (Task 0's last + Task 1's last + Task 2's)
 * Task N's altitudes += prefifix sum of Tasks (0..N-1)
 
 You can do this with a single call to `MPI_Exscan()` to get each node's exclusive prefix sum.  I've left a comment in the code where you need to add this.
@@ -66,7 +66,7 @@ The *vertical angle* from a viewing point `(x,y)` and a target `(x',y')` is defi
 
  However, this isn't quite correct, because every Task isn't yet aware of what the prior Task's maximum vertical angle is.  Once again, prefix scan, this time prefix *max* scan will save us.
 
- Where I've written "Step 2" in the comments, use `MPI_Exscan` once again, this time calculate the max scan of the last value in every Task's `maxangles` array. 
+ Where I've written "Step 2" in the comments, use `MPI_Exscan` once again, this time calculate the max scan of the last value in every Task's `maxangles` array.
 
 
 I've then written a `FixAnglesAndFindVisible` function which, if your code is correct, will properly generate a local array of `char`, with a 0 if the point is not viewable, and a 1 if it is.

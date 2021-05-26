@@ -1,4 +1,4 @@
-# Week 7 Programming Assignments: OpenMP
+# <center>Week 7 Programming Assignments: OpenMP<center>
 
 
 ## Setup:
@@ -6,14 +6,14 @@
 * copy `week-7-openmp` into your personal repo
 
 ## Compiling notes:
-* You can compile with `gcc -fopenmp` 
+* You can compile with `gcc -fopenmp`
 * Or you can just use the `Makefile` to `make pfor-no-sugar-arraysum`
     * Note: If you MacOS you'll have to modify the `Makefile`
 
 
 # In-Class 1: Array Sum
 
-Following a demonstration of how OpenMP handles parallel `pragma omp parallel` statements, and how scoping works for variables declared prior to and after forks. 
+Following a demonstration of how OpenMP handles parallel `pragma omp parallel` statements, and how scoping works for variables declared prior to and after forks.
 
 
 ## Modify the code
@@ -37,7 +37,7 @@ N = some large number
 dx = 1/N
 sum = 0
 for i in range(1,N):
-   w = dx 
+   w = dx
    xval = i*dx
    h = sqrt(1-(xval)^2)
    sum += w*h
@@ -47,4 +47,3 @@ pi = 4*sum
 ## Hand In:
 
 A writeup with timings including speedup *and* analysis for the two tasks.
-

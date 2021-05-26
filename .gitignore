@@ -13,7 +13,7 @@ mpicell
 omp-pi
 omp_vectors
 pfor-no-sugar-arraysum
-
+matrices
 
 # Object files
 2DCellAut.o
