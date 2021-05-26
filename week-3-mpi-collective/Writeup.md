@@ -1,6 +1,8 @@
 # <center>Week 3 Assignments</center>
 ### <center>Henry Jones</center>
 
+[Go Home](/../../jonesh-csc333-s21)
+
 # Tasks
 
 - [X] Normalize Vector
@@ -56,14 +58,14 @@ Normalize: 10/10
 - [+] Code Compiles
 - [+] Code Runs
 - [+] Writeup and Analysis
-- Notes: 
+- Notes:
 
 Cell: 29/29
 - [+] Code Exists
 - [+] Code Compiles
 - [+] Code Runs
 - [+] Writeup and Analysis
-- Notes: 
+- Notes:
 
 Challenge: 1/1
 - [+] Code Exists

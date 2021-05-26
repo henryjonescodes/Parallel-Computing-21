@@ -10,5 +10,3 @@ Author: Henry Jones
 * [Week 5 Midterm Project](week-5-midterm-project/)
 * [Week 7 openMP](week-7-openmp/)
 * [Week 8 caches](week-8-caches/)
-
-[Go Home](/../../)

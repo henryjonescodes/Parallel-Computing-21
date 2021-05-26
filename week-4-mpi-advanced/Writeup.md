@@ -1,6 +1,8 @@
 # <center>Week 4 Assignments</center>
 ### <center>Henry Jones</center>
 
+[Go Home](/../../jonesh-csc333-s21)
+
 # Tasks
 
 - [X] Normalize Vector using Reduce
@@ -86,7 +88,7 @@ Mean: 10/10
 - [x] Code Runs
 - [x] Writeup and Analysis
 
-STD: 10/10 
+STD: 10/10
 - [x] Code Exists
 - [x] Code Compiles
 - [x] Code Runs
@@ -104,4 +106,4 @@ LOS: 27/30
 - Notes:  You'll find that if you use MUCH bigger worlds you'll see speedups.  Be sure to graph them!
 
 Total:  57/60
-Overall: nice work. You can get +2 points with revisions. 
+Overall: nice work. You can get +2 points with revisions.
