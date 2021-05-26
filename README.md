@@ -11,4 +11,4 @@ Author: Henry Jones
 * [Week 7 openMP](week-7-openmp/)
 * [Week 8 caches](week-8-caches/)
 
-[Go Home](./)
+[Go Home](/../../)
