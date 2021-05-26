@@ -36,41 +36,73 @@ void print_vector(double *vec, int size)
   return;
 }
 
-void print_vector_p(double *vec, int size)
-{
-  double *p;
-  double * vec_end = vec+size;
-  for (p = vec; p < vec_end; p++)
-  {
-    printf("%f ", *p);
-  }
-
-}
-
 void vector_add(double *v1, double* v2, double *result, int size, int nthreads)
 {
-  //write me with openmp
+  #pragma omp parallel num_threads(nthreads)
+  {
+    int myid = omp_get_thread_num();
+  	int threadcount = omp_get_num_threads();
+    for (int i = myid ; i < size; i+=threadcount)
+  	{
+      result[i] = v1[i] + v2[i];
+    }
+  }
 }
 
 //return the mean of a vector
 double vector_mean(double *v1, int size, int nthreads)
 {
-  //write me with openmp
+  double globalsum = 0;
+  #pragma omp parallel num_threads(nthreads)
+  {
+    double localsum = 0;
+    int myid = omp_get_thread_num();
+  	int threadcount = omp_get_num_threads();
+    for (int i = myid ; i < size; i+=threadcount)
+    {
+      localsum += v1[i];
+    }
+  #pragma omp critical
+  globalsum += localsum;
+  }
+  return globalsum/(double)size;
 }
 
 //return the magnitude of a a vector
 // (squareroot of sum of squares )
 double vector_mag(double *v1, int size, int nthreads)
 {
-  //write me with openmp
+  double avg = vector_mean(v1, size, nthreads);
+  double globalss = 0;
+  #pragma omp parallel num_threads(nthreads)
+  {
+    double localss = 0;
+    int myid = omp_get_thread_num();
+  	int threadcount = omp_get_num_threads();
+    for (int i = myid ; i < size; i+=threadcount)
+    {
+      localss += v1[i] * v1[i];
+    }
+  #pragma omp critical
+  globalss += localss;
+  }
+  double magnitude = sqrt(globalss);
+  return magnitude;
 }
 
-//normalize a vector, putting result in outv 
+//normalize a vector, putting result in outv
 void vector_normalize(double *v1, double *outv, int size, int nthreads)
 {
- //first a call to vector mag
- //then an omp for loop that divides evertying in the vector by magnitude
- //warning don't ever omp parallelize loops that call functions that also parallelize 
+  double mag = vector_mag(v1, size, nthreads);
+  #pragma omp parallel num_threads(nthreads)
+  {
+    int myid = omp_get_thread_num();
+  	int threadcount = omp_get_num_threads();
+    for (int i = myid ; i < size; i+=threadcount)
+    {
+      outv[i] = v1[i]/mag;
+    }
+  }
 }
 
 int main(int argc, char *argv[])
@@ -83,7 +115,7 @@ int main(int argc, char *argv[])
   }
   else {
       if (argc > 1)
-        nthreads = strtol(argv[1],NULL,10); 
+        nthreads = strtol(argv[1],NULL,10);
       if (argc > 2)
         SIZE = atoi(argv[2]); //atoi converts a string to an int
       if (argc > 3)
@@ -101,8 +133,19 @@ double * vector3 =  calloc(SIZE,sizeof(double));
 vector1 = randomize_vector(vector1, SIZE);
 vector2 = randomize_vector(vector2, SIZE);
 
+printf("\nBefore Process:\n");
 print_vector(vector1,SIZE);
-print_vector(vector2,SIZE);
+// print_vector(vector2,SIZE);
+
+double mean = vector_mean(vector1, SIZE, nthreads);
+printf("Mean: %f\n", mean);
+double mag = vector_mag(vector1, SIZE, nthreads);
+printf("Magnitude: %f\n", mag);
+
+vector_normalize(vector1, vector3, SIZE, nthreads);
+
+printf("After Process:\n");
+print_vector(vector3,SIZE);
 
 printf("%f\n",sqrt(2.0));
 
