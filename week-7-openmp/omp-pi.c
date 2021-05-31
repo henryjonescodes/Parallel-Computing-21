@@ -49,8 +49,11 @@ int main(int argc, char *argv[])
   }
   printf("\nthreads: %d, N size: %d\n",nthreads,N);
 
+  double start = omp_get_wtime();
   long double pi = estimate_pi(N, nthreads);
+  double end = omp_get_wtime();
   printf("pi = %Le\n", pi);
+  printf("Estimating pi took (seconds): %f\n", end-start);
 
   // long double pi2 = non_parallel_pi(N);
   // printf("p2 = %Le\n", pi2);

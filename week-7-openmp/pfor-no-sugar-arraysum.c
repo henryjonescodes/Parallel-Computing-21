@@ -10,11 +10,10 @@ int main(int argc, char *argv[])
 	int globalsum = 0;
 
   #pragma omp parallel num_threads(nthreads)
-{
+  {
 	int myid = omp_get_thread_num();
 	int threadcount = omp_get_num_threads(); //like, super-high threadcount sheets?
   int localsum = 0;
-  #pragma omp parallel for
   for (int i = myid ; i < 10; i+=threadcount)
 	{
 		localsum += PiVals[i];

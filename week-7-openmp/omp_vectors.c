@@ -133,20 +133,23 @@ double * vector3 =  calloc(SIZE,sizeof(double));
 vector1 = randomize_vector(vector1, SIZE);
 vector2 = randomize_vector(vector2, SIZE);
 
-printf("\nBefore Process:\n");
-print_vector(vector1,SIZE);
+// printf("\nBefore Process:\n");
+// print_vector(vector1,SIZE);
 // print_vector(vector2,SIZE);
+//
+// double mean = vector_mean(vector1, SIZE, nthreads);
+// printf("Mean: %f\n", mean);
+// double mag = vector_mag(vector1, SIZE, nthreads);
+// printf("Magnitude: %f\n", mag);
 
-double mean = vector_mean(vector1, SIZE, nthreads);
-printf("Mean: %f\n", mean);
-double mag = vector_mag(vector1, SIZE, nthreads);
-printf("Magnitude: %f\n", mag);
-
+double start = omp_get_wtime();
 vector_normalize(vector1, vector3, SIZE, nthreads);
+double end = omp_get_wtime();
 
-printf("After Process:\n");
-print_vector(vector3,SIZE);
+// printf("After Process:\n");
+// print_vector(vector3,SIZE);
 
+printf("Normalization took (seconds): %f\n", end-start);
 printf("%f\n",sqrt(2.0));
 
 }

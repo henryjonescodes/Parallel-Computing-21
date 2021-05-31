@@ -15,6 +15,9 @@ omp_vectors
 pfor-no-sugar-arraysum
 matrices
 print_openmp_macro
+omp_trap1
+omp_trap2b
+
 
 # Object files
 2DCellAut.o
