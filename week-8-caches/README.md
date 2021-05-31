@@ -1,38 +1,19 @@
-# Matrix Manipulation and Caches
+# <center>Week 8: Caches</center>
 
-## Description 
+## Addition
 
-Beginning with starter code `matrices.c` (which initializes matrixes for you), implement functions for  matrix addition (adding two 2D matrices of equal size) and matrix transposition of square matrixes (swap elements around the diagonal).  Use the following criteria:
+With the static schedule, a smaller chunksize of 10 seemed ideal in general (given the sizes of matrices we computed), but there seemed to be a point where a larger larger chunk size was optimal, providing the best speedup on 4000 and 8000 size matrices.
 
-* use double precision floating point and dynamically allocated arrays (done in starter code)
-* write helper functions to initialize each matrix with appropriately randomized numbers (elaborate on starter code)
-* time each *serial* function using the OpenMP timing functions across a range of matrix sizes (be sure not to time your randomization routines):
-    * Matrix Sizes: 100x100, 500x,1000x,2000x, (larger if time/space allow)
-* Always use square matrices! Much easier!
+It seems that enforcing a chunksize on an array close to that chunksize just means some threads aren't working when they could be, leading to this dropoff of efficiency with smaller sized tasks.
 
-## Parallelizing 
+With the dynamic schedule the results were the inverse, smaller chunk sizes preformed better accross the board. This puzzles me as I would assume that larger chunksize would generally improve performance with larger input size due to the fewer necessary communication routines a system would have to preform with larger chunks.
 
-Now Parallelize your matrix operations using OpenMP
+## Transposition
 
-* time each implementation varying each of the following:
-    * number of threads
-    * matrix size
-    * schedule, using the OpenMP `schedule` pragma directive
-        *   static, chunksizes of 1, 10, and 100
-        * dynamic, chunksizes of 1, 10, 100
+With transposition I found a major differnce in the effect of chunk sizes between the two scheduling methods.
 
-**Hint**: Use a non-random seed to initialize the matrix, so that you can confirm that your single and multi-threaded programs produce identical results.
+On matrices greater than 1000 by 1000 the static schedule produced much higher speedup values when given a larger chunk size. Likewise, the dynamic schedule produced similar results, and although the highest value was achieved using the static schedule, it was much more stable: that is it's speedup didn't fall off as the input value increased past 4000.
 
-## Crowdsourcing results
+Detailed timing data for just my tests can be found on a sepparate [sheet](https://docs.google.com/spreadsheets/d/1Gtb4QWdxb_lHFBFZLiGZFeQ0lcC6ua-aBByfodmqR2c/edit?usp=sharing).
 
-
-I will have created a google spreadsheet for you all to post timings for the various experiments.  Please post your data, and be sure to indicate what processor architecture you are using.
-
-## Submit 
-
-An analysis of the Speedup and Efficiency of your code.   In cases where speedup and efficiency don't scale linearly, provide some explanations about how interaction between caches and cores could affect your measurements
-
-Add/Commit/Push:
-*  your code
-* any additional code/scripts used for testing
-* your `Writeup.md` (submitted here, via nexus)
+[Go Home](/../../jonesh-csc333-s21)

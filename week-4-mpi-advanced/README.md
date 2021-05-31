@@ -1,86 +1,109 @@
-# <center>Week 4: Advanced MPI</center>
+# <center>Week 4 Assignments</center>
+### <center>Henry Jones</center>
 
-# Introduction
+[Go Home](/../../jonesh-csc333-s21)
 
-This week we learned advanced MPI collective communication, most importantly `MPI_Reduce`, one of the most important concepts in parallel programming.  We'll start by doing some in-class exercises, then move on to a fun application of the prefix sum algorithm.
+# Tasks
+
+- [X] Normalize Vector using Reduce
+- [X] Vector Mean
+- [X] Vector Standard Deviation
+- [X] Line of Sight
+
+# Observations and Measures
+
+## Normalize Vector
+
+For my normalization algorithm I was able to strip a lot of 'junk' I needed to get other MPI methods working away from my previous code. I wrote `parallel_integer_ss()` and `parallel_double_ss()` with calls to `MPI_Allreduce()` which both calculate SS in similar ways. I didn't end up seeing much speedup with this method over my previous data (from week 3) where i observed a speedup of 1.4999562.
+
+For my tests I tried vectors with `size = 10,000,000` on 4 and 1 processes, times detailed below in seconds.
+
+| MPI_Normalize_Vector | #1       | #2       | #3       | #4       | #5       | Average (mean)
+|----------------------|----------|----------|----------|----------|----------|----------------------|
+| One Process          | 0.204073 | 0.191399 | 0.189958 | 0.193028 | 0.191665 | 0.1940246 |
+| 4 Processes          | 0.279422 | 0.286282 | 0.284132 | 0.287184 | 0.291430 | 0.28569   |
 
 
-# In Class Thursday
+Speedup (4 cores): 0.6791438272
 
-## Vector Normalization round 2
-
-* Start by copying your vector normalization code into this directory
-* update the code to use `MPI_Allreduce` with the `MPI_Sum` operator to get the sum of squares shared with *all* tasks, instead of having the root node receive, accumulate, and then send the sum of squares.
-* time your code across several tasks and vector sizes.  Make a note in your `Writeup.md`
 
 ## Vector Mean
 
-* Similarly, create an `MPI_Vector_Mean.c` and use the collective communication tools to calculate the mean of a vector.
-* Each task should create its *own* local array with random values, and then calculate the local sum.
-* Task 0 should then use `MPI_Reduce` to accumulate the local sums.
-* time your code across several tasks and vector sizes.  Make a note in your `Writeup.md`
+Vector mean was the most simple for me, I used a single `MPI_reduce()` in order to sum the partial sums from non-root nodes and had node 0 divide out `sum(X[i])/N` to get the mean.
 
-## Vector STD
+For my tests I tried vectors with `size = 1,000,000,000` on 4 and 1 processes, times detailed below in seconds.
 
-Now we'll implement standard deviation using the formula and method discussed in lecture
+| MPI_Vector_Mean | #1        | #2        | #3        | #4        | #5        | Average (mean)
+|-----------------|-----------|-----------|-----------|-----------|-----------|----------------------|
+| One Process     | 15.303540 | 12.559255 | 11.852646 | 11.336006 | 11.804202 | 12.5711298 |
+| 4 Processes     | 3.957062  | 2.958990  | 2.895106  | 2.877103  | 3.104518  | 3.1585558 |
 
-* Next create an `MPI_Vector_STD.c` Using the standard deviation formula.
-* Each task should create its own random vector and calculate its local sum
-* Each task should use `MPI_Allreduce` to obtain the global sum, and use that to calculate the global mean
-* Each task should calculate its local sum of squared differences (squared distance between the value at every index and the global mean)
-* Task 0 should then Reduce these local sum squared differences to calculate the standard deviation.
+Speedup (4 cores): 3.980024604915956
 
+This speedup is probably due to the simplistic nature of the problem, as the size of the data went up, there wasn't an additional tax from communication and the processes generally should calculate their portion of the problem efficiently. Therefore, significant speedup occoured since the communication takes a small fraction of time when the input size is huge and that input was effectivly quartered by assigning it to 4 processes.
 
-## Submit:
+## Vector Standard Deviation
 
-* add/commit/push your solutions above
-* Use tables in your `Writeup.md` to provide timing data that is nicely formatted
+For vector standard deviation I utilized both `MPI_Allreduce()` and `MPI_reduce()` to commmunicate. First `MPI_Allreduce()` is used to distrubute the sum of all values to all nodes. Then, after a partial sum of squares is generated one each node `MPI_reduce()` is used to accumulate the global sum of squares which is opperated on by node 0 to get the actual standard deviation.
 
-# Line of Sight Algorithm (1-D)
+For my tests I tried vectors with `size = 1,000,000,000` on 4 and 1 processes, times detailed below in seconds.
 
-In this project you'll implement the prefix-max algorithm discussed in lecture in order to calculate line of site on a 1-D map.   There are several steps.
+| MPI_Vector_STD | #1        | #2        | #3        | #4        | #5        | Average (mean)
+|----------------|-----------|-----------|-----------|-----------|-----------|----------------------|
+| One Process    | 20.291070 | 18.061919 | 17.615132 | 17.613494 | 19.075581 | 18.5314392 |
+| 4 Processes    | 4.408949  | 4.373965  | 5.069144  | 5.023227  | 4.356653  | 4.6463876 |
 
-## Step 1: generate a map
+Speedup (4 cores): 3.988354135586967
 
-We'll use an array of integers to represent altitudes in meters.   To parallelize this algorithm, we'll have each task be responsible for a separate contiguous block of the terrain (i.e. block-distributed).   I've gone ahead and written a function called `MakeTerrain` that makes a terrain by iterating through a local terrain, picking a small altitude change (delta) between +2 and -2, and adding that to the prior value of the terrain (essentially we're doing a prefix sum over the deltas).  To make things interesting, the root node will start its altitude not at zero, but at 100 (meters).
+Again, the speedup here is very large. This is once again a communication thing. Standard deviation with large sized arrays is an effective use of parallelization because it too can quarter its data (on 4 processes) and has relativly negligable communication cost when size increases.
 
+## Line of Sight
 
-However, we'll need to "connect" these terrains together so that they're contiguous -- right now the starting height at each non-root task is small (+/- 2), but instead we need to increase its local height by the last height of the prior task (that is to say, if task 0's terrain ends at altitude 105, and Task 1's altitude begins at 2, then we want to add 105 to every value in Terrain 1.  
+For line of sight I contributed all changes to my code as I did it my self. Timing was taken before data allocation and after all MPI calls running on my Mac.
 
-Specifically we need to calculate the node-wise exclusive prefix sum of the last element of every node's terrain, and add that value to every altitude in current task.   In other words:
+| MPI_LOS     | #1       | #2       | #3       | #4       | #5       | Average (Mean) |
+|-------------|----------|----------|----------|----------|----------|----------------|
+| One Process | 0.000200 | 0.000226 | 0.000175 | 0.000167 | 0.000236 | 0.0002008 |
+| 4 Processes | 0.000562 | 0.000521 | 0.000575 | 0.000552 | 0.000505 | 0.000543 |
 
-* Task 0's altitude remains unchanged
-* Task 1 altitudes += Task 0's last altitude
-* Taks 2 altitudes += (Task 0's last + Task 1's last)
-* Task 3 altitudes += (Task 0's last + Task 1's last + Task 2's)
-* Task N's altitudes += prefifix sum of Tasks (0..N-1)
+Speedup (4 cores): .3697974217
 
-You can do this with a single call to `MPI_Exscan()` to get each node's exclusive prefix sum.  I've left a comment in the code where you need to add this.
+Unlike the other two problems in this set, the speedup here is minimal. This is the inverse of what's happening in the other two as communication plays a large role in the algorithm. Expecially here with such a small world, each process spends a large amount of 'energy' dealing with communication. Perhaps with a larger world size this would make sense to paralellize, but here its simply moot.
 
+Using the provided python code, I was able to generate pretty graphs like the one below consistently which I used to check if things were going as planned.
 
-## Step 2: Calculating and correcting vertical angles
+![](LOS.png)
 
-The *vertical angle* from a viewing point `(x,y)` and a target `(x',y')` is defined as `arctan((y' - y)/(x' - x))`.  Recall that the line-of-sight algorithm states: *a point is visible only if no prior point has a larger vertical angle that it*.
+# Feedback
 
- I've written a function `CalculateAngles` that calculates the vertical angle of every point in the local terrain.    This function also calculates the *maximum* vertical angle (prefix max scan) at every index.  
+Normalize v2: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
 
- However, this isn't quite correct, because every Task isn't yet aware of what the prior Task's maximum vertical angle is.  Once again, prefix scan, this time prefix *max* scan will save us.
+Mean: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
 
- Where I've written "Step 2" in the comments, use `MPI_Exscan` once again, this time calculate the max scan of the last value in every Task's `maxangles` array.
+STD: 10/10
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [x] Writeup and Analysis
 
+- Notes for Vector Ops: good work, although I'd prefer to see your tables laid out more clearly.
 
-I've then written a `FixAnglesAndFindVisible` function which, if your code is correct, will properly generate a local array of `char`, with a 0 if the point is not viewable, and a 1 if it is.
+---
 
-## Step 3: Cleaning up, printing and timing.
+LOS: 27/30
+- [x] Code Exists
+- [x] Code Compiles
+- [x] Code Runs
+- [-] Writeup and Analysis
+- Notes:  You'll find that if you use MUCH bigger worlds you'll see speedups.  Be sure to graph them!
 
-I've written code that gathers and prints the visibility array.  Write similar code that gathers a global altitude array and prints it out.  
-
-Format your output so that it can be easily cut/paste into the colab notebook linked to on the nexus site.  
-
-Take timing data looking for speedup across a number of world sizes and tasks.  
-
-## Hand in:
-
-* Your `MPI_LOS.c`
-* A writeup describing your contributions to the code as well as nicely formatted timing data *and analysis*.
-* You should be able to include images produced by the colab notebook into your writeup (you may add these images to your repo.)
+Total:  57/60
+Overall: nice work. You can get +2 points with revisions.
