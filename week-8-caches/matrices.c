@@ -5,6 +5,8 @@
 #include <omp.h>
 #include <stdbool.h>
 
+#define CHUNK 100
+
 //=========================== Serial functions =================================
 
 bool PRINT_MATRICES = false;
@@ -72,7 +74,7 @@ void initializeMatrix_p(double *matrix, int rows, int cols, int nthreads){
 }
 
 void addMatrix_p(double *mat1, double *mat2, double *result, int rows, int cols, int nthreads){
-  #pragma omp parallel for num_threads(nthreads)
+  #pragma omp parallel for schedule(dynamic, CHUNK) num_threads(nthreads)
   for(int i = 0; i<rows; i++){
     for(int j = 0; j<cols; j++){
       int here = (i*rows)+j;
@@ -82,7 +84,7 @@ void addMatrix_p(double *mat1, double *mat2, double *result, int rows, int cols,
 }
 
 void transposeMatrix_p(double *mat, double *result, int rows, int cols, int nthreads){
-  #pragma omp parallel for num_threads(nthreads)
+  #pragma omp parallel for schedule(dynamic, CHUNK) num_threads(nthreads)
   for(int i = 0; i<rows; i++){
     for(int j= 0; j<cols; j++){
       int here = (i*rows)+j;
@@ -115,7 +117,7 @@ int main(int argc, char *argv[])
       if(argc > 3){
         numthreads = atoi(argv[3]);
       }
-      printf("Rows: %d, Cols: %d, Threads: %d\n",ROWS,COLS,numthreads);
+      printf("\nRows: %d, Cols: %d, Threads: %d\n",ROWS,COLS,numthreads);
   }
 
   double start = omp_get_wtime();
@@ -199,8 +201,6 @@ int main(int argc, char *argv[])
     printTimeData(time_init_parallel1, time_init_parallel2, "Parallel Init 1");
     printTimeData(time_init_parallel2, time_init_parallel3, "Parallel Init 2");
     printTimeData(time_add_parallel, time_add_parallel_end, "Parallel Add");
-    printTimeData(time_transpose_parallel, time_transpose_parallel_end, "Parallel Transpose");
-
     printTimeData(time_transpose_parallel, time_transpose_parallel_end, "Parallel Transpose");
 }
  //free(MAT); //don't FREE! C99 takes care of it if allocated like this
