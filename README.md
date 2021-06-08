@@ -23,29 +23,29 @@ Author: Henry Jones</center>
 
 | Assignment                                                |  Original Grade   | Requested Corrected Points  | New Grade   | Notes                       |
 |-----------------------------------------------------------|:-----------------:|----------------------------:|-------------|-----------------------------|
-| [Week 1 C Bootcamp](week-1-c-bootcamp/)                   | 23/25             |                             | xx/25       |                             |
+| [Week 1 C Bootcamp](week-1-c-bootcamp/)                   | 23/25             |                             | 23/25       |                             |
 | [Week 2 MPI](week-2-mpi/)                                 | 18/25             |                             | xx/25       |                             |
-| [Week 4 MPI Advanced](week-4-mpi-advanced/)               | 57/60             |                             | xx/60       |                             |
+| [Week 4 MPI Advanced](week-4-mpi-advanced/)               | 57/60             |                             | 57/60       |                             |
 | [Week 5 Midterm Project](week-5-midterm-project/)         | xx/xx             |                             | xx/xx       |                             |
-| [Week 7 openMP](week-7-openmp/)                           | xx/xx             |                             | xx/xx       |                             |
-| [Week 8 caches](week-8-caches/)                           | xx/xx             |                             | xx/xx       |                             |
+| [Week 7 openMP](week-7-openmp/)                           | 100/100           |                             | 100/100     |                             |
+| [Week 8 caches](week-8-caches/)                           | 60/60             |                             | 60/60       |                             |
 | Totals                                                    | xx/xx             |                             | xx/xx       |                             |
 
 ## Problem Set Corrections
 
 | Assignment                                                |  Original Grade   | Requested Corrected Points  | New Grade   | Notes                       |
 |-----------------------------------------------------------|:-----------------:|----------------------------:|-------------|-----------------------------|
-| Problem Set #1 (Week 2)                                   | 1.8/2             |                             | xx/2        |                             |
+| Problem Set #1 (Week 2)                                   | 1.8/2             |                             | 1.8/2       |                             |
 | Problem Set #2 (Week 3)                                   | 2/2               |                             | 2/2         |                             |
 | Problem Set #3 (Week 4)                                   | xx/xx             |                             | xx/xx       |                             |
-| [Problem Set #4 (Week 7)](problem-sets/week7)             | xx/xx             |                             | xx/xx       |                             |
+| [Problem Set #4 (Week 7)](problem-sets/week7)             | 20/25             |                             | 20/25       |                             |
 | Totals                                                    | xx/xx             |                             | xx/xx       |                             |
 
 ## Midterm Corrections
 
 | Assignment                                                |  Original Grade   | Requested Corrected Points  | New Grade   | Notes                       |
 |-----------------------------------------------------------|:-----------------:|----------------------------:|-------------|-----------------------------|
-| Midterm                                                   | 55/60             |                             | xx/60       |                             |
+| Midterm                                                   | 55/60             |                             | 55/60       |                             |
 
 Add the corrected PDF to your repo.
 
