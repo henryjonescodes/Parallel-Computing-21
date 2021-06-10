@@ -10,8 +10,9 @@ Author: Henry Jones</center>
 * [Week 3 MPI Collective](week-3-mpi-collective/)
 * [Week 4 MPI Advanced](week-4-mpi-advanced/)
 * [Week 5 Midterm Project](week-5-midterm-project/)
-* [Week 7 openMP](week-7-openmp/)
-* [Week 8 caches](week-8-caches/)
+* [Week 7 OpenMP](week-7-openmp/)
+* [Week 8 Caches](week-8-caches/)
+* [Week 9 Final Project](week-9-final-project/)
 
 ## Problem Set Code
 
@@ -29,7 +30,7 @@ Author: Henry Jones</center>
 | [Week 5 Midterm Project](week-5-midterm-project/)         | xx/xx             |                             | xx/xx       |                             |
 | [Week 7 openMP](week-7-openmp/)                           | 100/100           |                             | 100/100     |                             |
 | [Week 8 caches](week-8-caches/)                           | 60/60             |                             | 60/60       |                             |
-| Totals                                                    | xx/xx             |                             | xx/xx       |                             |
+| Totals                                                    | 258/270           |                             | 258/270     |                             |
 
 ## Problem Set Corrections
 
@@ -39,7 +40,7 @@ Author: Henry Jones</center>
 | Problem Set #2 (Week 3)                                   | 2/2               |                             | 2/2         |                             |
 | Problem Set #3 (Week 4)                                   | xx/xx             |                             | xx/xx       |                             |
 | [Problem Set #4 (Week 7)](problem-sets/week7)             | 20/25             |                             | 20/25       |                             |
-| Totals                                                    | xx/xx             |                             | xx/xx       |                             |
+| Totals                                                    | 23.5/29           |                             | 23.5/29     |                             |
 
 ## Midterm Corrections
 
